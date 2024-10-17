@@ -15,7 +15,21 @@ const createNew = async (req, res, next) => {
     // })
   }
 }
+const getDetails = async (req, res, next) => {
+  try {
+    const boardId = req.params.id
+    const Board = await boardService.getDetails(boardId)
+    res.status(StatusCodes.OK).json(Board)
+
+  } catch (error) {
+    next(error)
+    // console.log(error)
+    // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    //   errors: error.message
+    // })
+  }
+}
 
 export const boardController = {
-  createNew
+  createNew, getDetails
 }

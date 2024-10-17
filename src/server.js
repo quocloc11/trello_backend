@@ -4,11 +4,14 @@ import { mapOrder } from '~/utils/sorts.js'
 import { CONNECT_DB, GET_DB } from './config/mongodb'
 import { env } from '~/config/environment'
 import { APIs_V1 } from '~/routes/v1'
+import cors from 'cors'
+import { corsOptions } from './config/cors'
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware.js'
 const START_SERVER = () => {
 
   const app = express()
 
+  app.use(cors(corsOptions))
   app.use(express.json())
 
   app.use('/v1', APIs_V1)
