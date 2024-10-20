@@ -29,7 +29,33 @@ const getDetails = async (req, res, next) => {
     // })
   }
 }
+const update = async (req, res, next) => {
+  try {
+    const boardId = req.params.id
+    const updateBoard = await boardService.update(boardId, req.body)
+    res.status(StatusCodes.OK).json(updateBoard)
 
+  } catch (error) {
+    next(error)
+    // console.log(error)
+    // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    //   errors: error.message
+    // })
+  }
+}
+const moveCardToDifferentColumn = async (req, res, next) => {
+  try {
+    const result = await boardService.moveCardToDifferentColumn(req.body)
+    res.status(StatusCodes.OK).json(result)
+
+  } catch (error) {
+    next(error)
+    // console.log(error)
+    // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    //   errors: error.message
+    // })
+  }
+}
 export const boardController = {
-  createNew, getDetails
+  createNew, getDetails, update, moveCardToDifferentColumn
 }

@@ -21,6 +21,9 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp('javascript').default(null),
   _destroy: Joi.boolean().default(false)
 })
+//chi dinh ko muon update
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt']
+
 const validateBeforeCreate = async (data) => {
   return await BOARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
 
@@ -84,7 +87,41 @@ const pushColumnOrderIds = async (column) => {
       { $push: { columnOrderIds: new ObjectId(column._id) } },//day vao cuoi culumnOderIds dk laf id
       { ReturnDocument: 'after' }
     )
-    return result.value
+    return result
+
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+const pullColumnOrderIds = async (column) => {
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(column.boardId) },
+      { $pull: { columnOrderIds: new ObjectId(column._id) } },//day vao cuoi culumnOderIds dk laf id
+      { ReturnDocument: 'after' }
+    )
+    return result
+
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+const update = async (boardId, updateData) => {
+  try {
+    Object.keys(updateData).forEach(fieldName => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+        delete updateData[fieldName]
+      }
+    })
+    if (updateData.columnOrderIds) {
+      updateData.columnOrderIds = updateData.columnOrderIds.map(_id => (new ObjectId(_id)))
+    }
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(boardId) },
+      { $set: updateData },//day vao cuoi culumnOderIds dk laf id
+      { ReturnDocument: 'after' }
+    )
+    return result
 
   } catch (error) {
     throw new Error(error)
@@ -94,5 +131,6 @@ export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
   createNew, findOneByid,
-  getDetails, pushColumnOrderIds
+  getDetails, pushColumnOrderIds,
+  update, pullColumnOrderIds
 }

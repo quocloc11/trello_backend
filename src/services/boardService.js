@@ -3,6 +3,8 @@ import { boardModel } from '~/models/boardModel'
 import ApiError from '~/utils/ApiError'
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
+import { columnModel } from '~/models/columnModel'
+import { cardModel } from '~/models/cardModel'
 //luu y trong server phai co return
 const createNew = async (reqBody) => {
   // eslint-disable-next-line no-useless-catch
@@ -12,9 +14,9 @@ const createNew = async (reqBody) => {
       slug: slugify(reqBody.title)
     }
     const createdBoard = await boardModel.createNew(newBoard)
-    console.log(createdBoard)
+
     const getNewBoard = await boardModel.findOneByid(createdBoard.insertedId)
-    console.log('getNewBoard', getNewBoard)
+
     return getNewBoard
   } catch (error) { throw error }
 }
@@ -38,6 +40,39 @@ const getDetails = async (boardId) => {
     return resBoard
   } catch (error) { throw error }
 }
+const update = async (boardId, reqBody) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const updateData = {
+      ...reqBody,
+      updatedAt: Date.now()
+    }
+    const updatedBoard = await boardModel.update(boardId, updateData)
+    return updatedBoard
+
+
+  } catch (error) { throw error }
+}
+const moveCardToDifferentColumn = async (reqBody) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    await columnModel.update(reqBody.prevColumnId, {
+      cardOrderIds: reqBody.prevCardOrderIds,
+      updatedAt: Date.now()
+    })
+
+    await columnModel.update(reqBody.nextColumnId, {
+      cardOrderIds: reqBody.nextCardOrderIds,
+      updatedAt: Date.now()
+    })
+    await cardModel.update(reqBody.currentCardId, {
+      columnId: reqBody.nextColumnId
+    })
+    return { updateResult: 'Successfully' }
+
+
+  } catch (error) { throw error }
+}
 export const boardService = {
-  createNew, getDetails
+  createNew, getDetails, update, moveCardToDifferentColumn
 }
