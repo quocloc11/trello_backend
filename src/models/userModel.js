@@ -65,9 +65,9 @@ const findOneByEmail = async (emailValue) => {
 
 const update = async (userId, updateData) => {
   try {
-    ObjectId.keys(updateData).forEach(fieldName => {
+    Object.keys(updateData).forEach(fieldName => {
       if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
-        delete updateData(fieldName)
+        delete updateData[fieldName]
       }
     })
     const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(

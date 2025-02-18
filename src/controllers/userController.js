@@ -14,6 +14,25 @@ const createNew = async (req, res, next) => {
   }
 }
 
+const verifyAccount = async (req, res, next) => {
+  try {
+    const result = await userService.verifyAccount(req.body)
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) {
+    next(error)
+
+  }
+}
+const login = async (req, res, next) => {
+  try {
+    const result = await userService.login(req.body)
+    console.log('result', result)
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) {
+    next(error)
+
+  }
+}
 export const userController = {
-  createNew
+  createNew, verifyAccount, login
 }
