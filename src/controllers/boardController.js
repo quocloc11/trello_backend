@@ -56,6 +56,24 @@ const moveCardToDifferentColumn = async (req, res, next) => {
     // })
   }
 }
+
+const getBoards = async (req, res, next) => {
+  try {
+    const userId = req.jwtDecoded._id
+
+    const { page, itemsPerPage } = req.query
+    const results = await boardService.getBoards(userId, page, itemsPerPage)
+
+    res.status(StatusCodes.OK).json(results)
+
+  } catch (error) {
+    next(error)
+    // console.log(error)
+    // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    //   errors: error.message
+    // })
+  }
+}
 export const boardController = {
-  createNew, getDetails, update, moveCardToDifferentColumn
+  createNew, getDetails, update, moveCardToDifferentColumn, getBoards
 }

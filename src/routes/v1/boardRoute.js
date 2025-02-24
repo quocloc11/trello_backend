@@ -7,9 +7,7 @@ import { authMiddleware } from '~/middlewares/authMiddleware'
 const Router = express.Router()
 
 Router.route('/')
-  .get(authMiddleware.isAuthorized, (req, res) => {
-    res.status(StatusCodes.OK).json({ message: 'APIS get list' })
-  })
+  .get(authMiddleware.isAuthorized, boardController.getBoards)
   .post(authMiddleware.isAuthorized, boardValidation.createNew, boardController.createNew)
 Router.route('/:id')
   .get(authMiddleware.isAuthorized, boardController.getDetails)
