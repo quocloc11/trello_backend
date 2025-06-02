@@ -40,7 +40,7 @@ const START_SERVER = () => {
 
   if (env.BUILD_MODE === 'production') {
     const port = process.env.PORT || env.APP_PORT || 3000;
-    const host = '0.0.0.0'; // thường production bind ra tất cả IP
+    const host = env.APP_HOST === 'localhost' ? '0.0.0.0' : env.APP_HOST;
 
     server.listen(port, host, () => {
       console.log(`Hello ${env.AUTHOR}, I am running at http://${port}/`);
