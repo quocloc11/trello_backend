@@ -30,18 +30,31 @@ const START_SERVER = () => {
 
   app.use(errorHandlingMiddleware)
 
-  const server = http.createServer(app)
+  const server = http.createServer(app);
 
-  const io = socketIo(server, { cors: corsOptions })
+  const io = socketIo(server, { cors: corsOptions });
   io.on('connection', (socket) => {
-    console.log('a user connected', socket.id)
-    inviteUserToBoardSocket(socket)
-  })
+    console.log('a user connected', socket.id);
+    inviteUserToBoardSocket(socket);
+  });
 
-  server.listen(env.APP_PORT, env.APP_HOST, () => {
-    // eslint-disable-next-line no-console
-    console.log(`Hello ${env.AUTHOR}, I am running at ${env.APP_HOST}:${env.APP_PORT}/`)
-  })
+  if (env.BUILD_MODE === 'production') {
+    const port = process.env.PORT || env.APP_PORT || 3000;
+    const host = '0.0.0.0'; // thường production bind ra tất cả IP
+
+    server.listen(port, host, () => {
+      console.log(`Hello ${env.AUTHOR}, I am running at http://${port}/`);
+    });
+  } else {
+    const port = env.APP_PORT || 3000;
+    const host = env.APP_HOST || 'localhost';
+
+    server.listen(port, host, () => {
+      console.log(`Hello ${env.AUTHOR}, I am running at http://${host}:${port}/`);
+    });
+  }
+
+
 }
 (async () => {
   try {
