@@ -16,7 +16,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   username: Joi.string().required().trim().strict(),
   displayName: Joi.string().required().trim().strict(),
   avatar: Joi.string().default(null),
-  role: Joi.string().valid(USER_ROLES.CLIENT, USER_ROLES.ADMIN).default(USER_ROLES.CLIENT),
+  role: Joi.string().valid(...Object.values(USER_ROLES)).default(USER_ROLES.CLIENT),
 
   isActive: Joi.boolean().default(false),
   verifyToken: Joi.string(),
@@ -29,6 +29,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
 const INVALID_UPDATE_FIELDS = ['_id', 'email', 'username', 'createdAt']
 
 const validateBeforeCreate = async (data) => {
+  console.log('data', data)
   return await USER_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
 
 }
@@ -73,9 +74,9 @@ const update = async (userId, updateData) => {
     const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(userId) },
       { $set: updateData },
-      { ReturnDocument: 'after' },
+      { returnDocument: 'after' }
     )
-    return result
+    return result.value
   } catch (error) {
     throw new Error(error)
   }

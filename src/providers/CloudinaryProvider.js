@@ -12,8 +12,14 @@ cloudinaryV2.config({
 const streamUpload = (fileBuffer, folderName) => {
   return new Promise((resolve, reject) => {
     const stream = cloudinaryV2.uploader.upload_stream({ folder: folderName }, (err, result) => {
-      if (err) reject(err)
-      else resolve(result)
+      if (err) {
+        console.error('Cloudinary Upload Error:', err)
+        reject(err)
+      }
+      else {
+        console.log('Cloudinary Upload Success:', result)
+        resolve(result)
+      }
     })
     streamifier.createReadStream(fileBuffer).pipe(stream)
   })

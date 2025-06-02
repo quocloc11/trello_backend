@@ -114,6 +114,7 @@ const refreshToken = async (clientRefreshToken) => {
 const update = async (userId, reqBody, userAvarFile) => {
   try {
     const existUser = await userModel.findOneById(userId)
+    console.log('existUser', existUser)
     if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Account not found')
     if (!existUser.isActive) throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your account is not active')
 
@@ -137,6 +138,7 @@ const update = async (userId, reqBody, userAvarFile) => {
     } else {
       updatedUser = await userModel.update(existUser._id, reqBody)
     }
+    console.log('updatedUser', updatedUser)
     return pickUser(updatedUser)
   } catch (error) {
     throw error

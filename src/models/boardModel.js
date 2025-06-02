@@ -7,6 +7,7 @@ import { BOARD_TYPES } from '~/utils/constants'
 import { columnModel } from './columnModel'
 import { cardModel } from './cardModel'
 import { pagingSkipValue } from '~/utils/algorithms'
+import { userModel } from './userModel'
 const BOARD_COLLECTION_NAME = 'boards'
 const BOARD_COLLECTION_SCHEMA = Joi.object({
 
@@ -90,6 +91,24 @@ const getDetails = async (userId, boardId) => {
           foreignField: 'boardId',//khoa ngoai,
           as: 'cards'
         }
+      },
+      {
+        $lookup: {
+          from: userModel.USER_COLLECTION_NAME,
+          localField: 'ownerIds',
+          foreignField: '_id',//khoa ngoai,
+          as: 'owners',
+          pipeline: [{ $project: { 'password': 0, 'verifyToken': 0 } }]
+        }
+      },
+      {
+        $lookup: {
+          from: userModel.USER_COLLECTION_NAME,
+          localField: 'memberIds',
+          foreignField: '_id',//khoa ngoai,
+          as: 'members',
+          pipeline: [{ $project: { 'password': 0, 'verifyToken': 0 } }]
+        }
       }
     ]).toArray()
     return result[0] || null
@@ -145,7 +164,7 @@ const update = async (boardId, updateData) => {
   }
 }
 
-const getBoards = async (userId, page, itemsPerPage) => {
+const getBoards = async (userId, page, itemsPerPage, queryFilters) => {
   try {
     const queryConditions = [
       { _destroy: false },
@@ -157,6 +176,15 @@ const getBoards = async (userId, page, itemsPerPage) => {
         ]
       }
     ]
+    if (queryFilters) {
+      Object.keys(queryFilters).forEach(key => {
+        //phan biet chu hoa thuong
+        //queryConditions.push({ [key]: { $regex: queryFilters[key] } })
+
+        queryConditions.push({ [key]: { $regex: new RegExp(queryFilters[key], 'i') } })
+
+      })
+    }
     const query = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate(
       [
         { $match: { $and: queryConditions } },
@@ -184,10 +212,25 @@ const getBoards = async (userId, page, itemsPerPage) => {
     throw new Error(error)
   }
 }
+
+const pushMembersIds = async (boardId, userId) => {
+  try {
+    const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(boardId) },
+      { $pull: { memberIds: new ObjectId(userId) } },//day vao cuoi culumnOderIds dk laf id
+      { ReturnDocument: 'after' }
+    )
+    return result
+
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
   createNew, findOneByid,
   getDetails, pushColumnOrderIds,
-  update, pullColumnOrderIds, getBoards
+  update, pullColumnOrderIds, getBoards,
+  pushMembersIds
 }

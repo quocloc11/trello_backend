@@ -9,12 +9,16 @@ import { corsOptions } from './config/cors'
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware.js'
 import cookieParser from 'cookie-parser'
 
+import http from 'http'
+import socketIo from 'socket.io'
+import { emit } from 'process'
+import { inviteUserToBoardSocket } from './sockets/inviteUserToBoardSocket'
 const START_SERVER = () => {
 
   const app = express()
 
   app.use((req, res, next) => {
-    res.set(('Cache-Control', 'no-store'))
+    res.set('Cache-Control', 'no-store');
     next()
   })
   app.use(cookieParser())
@@ -26,8 +30,15 @@ const START_SERVER = () => {
 
   app.use(errorHandlingMiddleware)
 
+  const server = http.createServer(app)
 
-  app.listen(env.APP_PORT, env.APP_HOST, () => {
+  const io = socketIo(server, { cors: corsOptions })
+  io.on('connection', (socket) => {
+    console.log('a user connected', socket.id)
+    inviteUserToBoardSocket(socket)
+  })
+
+  server.listen(env.APP_PORT, env.APP_HOST, () => {
     // eslint-disable-next-line no-console
     console.log(`Hello ${env.AUTHOR}, I am running at ${env.APP_HOST}:${env.APP_PORT}/`)
   })

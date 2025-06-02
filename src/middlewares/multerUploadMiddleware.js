@@ -4,7 +4,7 @@ import ApiError from '~/utils/ApiError'
 import { ALLOW_COMMON_FILE_TYPES, LIMIT_COMMON_FILE_SIZE } from '~/utils/validators'
 
 const customFileFilter = (req, file, callback) => {
-  console.log('file', file)
+
   if (!ALLOW_COMMON_FILE_TYPES.includes(file.mimetype)) {
     const errMessage = 'File type is invalid. Only accept jpg, jpeg and png'
     return callback(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errMessage), null)

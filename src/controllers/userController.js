@@ -62,10 +62,14 @@ const logout = async (req, res, next) => {
 const refreshToken = async (req, res, next) => {
   try {
     const result = await userService.refreshToken(req.cookies?.refreshToken)
+
     res.cookie('accessToken', result.accessToken, {
-      httpOnly: true, secure: true, sameSite: 'none', maxAge: ms
-        ('14 days')
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('14 days')
     })
+
     res.status(StatusCodes.OK).json(result)
   } catch (error) {
     next(new ApiError(StatusCodes.FORBIDDEN, 'Please Sign In! (Error from refresh Token'))
@@ -76,9 +80,9 @@ const refreshToken = async (req, res, next) => {
 const update = async (req, res, next) => {
   try {
     const userId = req.jwtDecoded._id
-    const userAvarFile = req.file
-    //console.log('userAvarFile', userAvarFile)
-    const updatedUser = await userService.update(userId, req.body, userAvarFile)
+    const userAvatarFile = req.file
+    console.log('userAvarFile', userAvatarFile)
+    const updatedUser = await userService.update(userId, req.body, userAvatarFile)
     res.status(StatusCodes.OK).json(updatedUser)
   } catch (error) {
     next(error)
