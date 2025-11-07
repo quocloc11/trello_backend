@@ -1,10 +1,15 @@
-# Test Trello 
-Tài khoản :loc842211@gmail.com
-Mật Khẩu :112233A@
 
-Tài khoản :tranquocloc1201@gmail.com
-Mật Khẩu :112233A@
+# Setup this project
+After you download or clone this project, you need run this command to install Node packages
 
+```sh
+npm install
+```
+To start the application run the below command
 
+```sh
+npm run dev
+```
+ Tài khoản :loc842211@gmail.com Mật Khẩu :112233A@
 
-
+ Tài khoản :tranquocloc1201@gmail.com Mật Khẩu :112233A@
